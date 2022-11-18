@@ -41,7 +41,8 @@ common lang
 library
     import: lang
     exposed-modules:
-      MyModule
+      OffChain
+      OnChain
     build-depends:
       base >= 4.9 && < 5,
       aeson -any,
