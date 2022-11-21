@@ -19,11 +19,10 @@ import qualified Data.Map as Map
 import Data.Monoid (Last (Last))
 import GHC.Generics (Generic)
 import Ledger
-  ( Address,
-    AssetClass,
+  ( AssetClass,
+    ChainIndexTxOut,
     PaymentPubKeyHash,
     Value,
-    getCardanoTxId,
     pubKeyHashAddress,
   )
 import qualified Ledger.Constraints as Constraints
@@ -31,14 +30,13 @@ import Ledger.Tx (ciTxOutValue)
 import qualified Ledger.Typed.Scripts as Scripts
 import OnChain
 import Plutus.Contract
-  ( AsContractError,
-    Contract,
+  ( Contract,
     ContractError,
     Endpoint,
     Promise,
-    awaitTxConfirmed,
     endpoint,
     ownFirstPaymentPubKeyHash,
+    ownUtxos,
     select,
     submitTxConstraintsWith,
     tell,
@@ -48,6 +46,7 @@ import Plutus.Contract
 
 type AppSchema =
   Endpoint "fundsAt" PaymentPubKeyHash
+    .\/ Endpoint "ownFunds" ()
     .\/ Endpoint "ownFirstPaymentPubKeyHash" ()
     .\/ Endpoint "mintAsset" Integer
 
@@ -56,12 +55,14 @@ endpoints =
   ( endpoint @"fundsAt" (fundsAt >=> tellAppResponse FundsAt)
       `select` endpoint @"ownFirstPaymentPubKeyHash" (const ownFirstPaymentPubKeyHash >=> tellAppResponse OwnFirstPaymentPubKeyHash)
       `select` endpoint @"mintAsset" (mintAsset >=> tellAppResponse MintAsset)
+      `select` endpoint @"ownFunds" (const ownFunds >=> tellAppResponse OwnFunds)
   )
     <> endpoints
 
 data AppResponse
   = OwnFirstPaymentPubKeyHash PaymentPubKeyHash
   | FundsAt Value
+  | OwnFunds Value
   | MintAsset AssetClass
   deriving stock (Eq, Show, Generic)
   deriving anyclass (ToJSON, FromJSON)
@@ -71,12 +72,17 @@ tellAppResponse wrapper = tell . Last . Just . wrapper
 
 -- | Gets all UTxOs belonging to the user and concats them into one Value
 fundsAt :: PaymentPubKeyHash -> Contract (Last AppResponse) AppSchema ContractError Value
-fundsAt pkh = utxosValue (const True) $ pubKeyHashAddress pkh Nothing
+fundsAt pkh = do
+  os <- utxosAt $ pubKeyHashAddress pkh Nothing
+  pure $ utxosValue (const True) os
 
-utxosValue :: (AsContractError e) => (Value -> Bool) -> Address -> Contract w s e Value
-utxosValue p address = do
-  os <- Map.elems <$> utxosAt address
-  pure $ mconcat [val | o <- os, let val = view ciTxOutValue o, p val]
+ownFunds :: Contract (Last AppResponse) AppSchema ContractError Value
+ownFunds = do
+  utxosValue (const True) <$> ownUtxos
+
+utxosValue :: (Value -> Bool) -> Map.Map k ChainIndexTxOut -> Value
+utxosValue p os =
+  mconcat [val | o <- Map.elems os, let val = view ciTxOutValue o, p val]
 
 mintAsset ::
   Integer ->
@@ -86,7 +92,8 @@ mintAsset amount = do
   let mintingPolicy = testTokenMintingPolicy pkh
   let asset = testTokenAsset pkh
   let lookups = Constraints.plutusV1MintingPolicy mintingPolicy
-  let mintTx = Constraints.mustMintValue (testTokenValue pkh amount)
-  tx <- submitTxConstraintsWith @Scripts.Any lookups mintTx
-  _ <- awaitTxConfirmed (getCardanoTxId tx)
+  let mintTx =
+        Constraints.mustMintValue (testTokenValue pkh amount)
+          <> Constraints.mustBeSignedBy pkh
+  _ <- submitTxConstraintsWith @Scripts.Any lookups mintTx
   pure asset
