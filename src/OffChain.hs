@@ -1,4 +1,6 @@
 {-# LANGUAGE DataKinds #-}
+{-# LANGUAGE DeriveAnyClass #-}
+{-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE DerivingStrategies #-}
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
@@ -12,8 +14,10 @@ module OffChain where
 
 import Control.Lens (view)
 import Control.Monad ((>=>))
+import Data.Aeson (FromJSON, ToJSON)
 import qualified Data.Map as Map
 import Data.Monoid (Last (Last))
+import GHC.Generics (Generic)
 import Ledger
   ( Address,
     PaymentPubKeyHash,
@@ -49,6 +53,8 @@ endpoints =
 data AppResponse
   = OwnFirstPaymentPubKeyHash PaymentPubKeyHash
   | FundsAt Value
+  deriving stock (Eq, Show, Generic)
+  deriving anyclass (ToJSON, FromJSON)
 
 tellAppResponse :: forall a. (a -> AppResponse) -> a -> Contract (Last AppResponse) AppSchema ContractError ()
 tellAppResponse wrapper = tell . Last . Just . wrapper

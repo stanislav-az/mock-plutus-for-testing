@@ -43,6 +43,7 @@ library
     exposed-modules:
       OffChain
       OnChain
+      PAB
     build-depends:
       base >= 4.9 && < 5,
       aeson -any,
@@ -57,6 +58,20 @@ library
       plutus-tx -any,
       plutus-tx-plugin -any,
       plutus-script-utils -any,
+      plutus-pab,
       text -any,
       lens -any,
+      openapi3,
+      prettyprinter,
     hs-source-dirs: src
+
+executable pab
+  import: lang
+  main-is: Main.hs
+  hs-source-dirs: pab
+  ghc-options:
+    -threaded
+  build-depends:
+    base >= 4.9 && < 5,
+    plutus-starter,
+    plutus-pab

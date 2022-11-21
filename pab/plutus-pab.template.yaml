@@ -1,0 +1,47 @@
+dbConfig:
+  dbConfigFile: <NODE_PATH>/pab-core.db
+  dbConfigPoolSize: 20
+
+pabWebserverConfig:
+  baseUrl: http://localhost:9080
+  staticDir: ./dist
+  permissiveCorsPolicy: False
+  # Optional timeout (in seconds) for calls to endpoints that are not currently
+  # available. If this is not set, calls to unavailable endpoints fail
+  # immediately.
+  endpointTimeout: 5
+  enableMarconi: False
+
+walletServerConfig:
+  tag: LocalWalletConfig
+  walletSettings:
+    baseUrl: http://localhost:8090
+
+nodeServerConfig:
+  pscBaseUrl: http://localhost:3001
+  pscSocketPath: <NODE_PATH>/configuration/sockets/node.socket
+  pscKeptBlocks: 100
+  pscNetworkId: "1" # Testnet network ID (main net = empty string)
+  pscSlotConfig:
+    scSlotZeroTime: 1596059091000 # Wednesday, July 29, 2020 21:44:51 - shelley launch time in milliseconds
+    scSlotLength: 1000 # In milliseconds
+  pscFeeConfig:
+    fcConstantFee:
+      getLovelace: 10 # Constant fee per transaction in lovelace
+    fcScriptsFeeFactor: 1.0 # Factor by which to multiply size-dependent scripts fee in lovelace
+  pscInitialTxWallets:
+    - getWallet: 1
+    - getWallet: 2
+    - getWallet: 3
+  pscNodeMode: AlonzoNode
+
+chainIndexConfig:
+  ciBaseUrl: http://localhost:9083
+
+requestProcessingConfig:
+  requestProcessingInterval: 1
+
+developmentOptions:
+  pabRollbackHistory: 100
+  pabResumeFrom:
+    { "tag" : "PointAtGenesis" }
