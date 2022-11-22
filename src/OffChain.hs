@@ -15,6 +15,7 @@ module OffChain where
 import Control.Lens (view)
 import Control.Monad ((>=>))
 import Data.Aeson (FromJSON, ToJSON)
+import Data.Foldable (Foldable (fold))
 import qualified Data.Map as Map
 import Data.Monoid (Last (Last))
 import GHC.Generics (Generic)
@@ -25,10 +26,15 @@ import Ledger
     Value,
     pubKeyHashAddress,
   )
+import qualified Ledger.Ada as Ada
 import qualified Ledger.Constraints as Constraints
 import Ledger.Tx (ciTxOutValue)
 import qualified Ledger.Typed.Scripts as Scripts
 import OnChain
+  ( testTokenAsset,
+    testTokenMintingPolicy,
+    testTokenValue,
+  )
 import Plutus.Contract
   ( Contract,
     ContractError,
@@ -49,6 +55,7 @@ type AppSchema =
     .\/ Endpoint "ownFunds" ()
     .\/ Endpoint "ownFirstPaymentPubKeyHash" ()
     .\/ Endpoint "mintAsset" Integer
+    .\/ Endpoint "splitWalletValueBy" Integer
 
 endpoints :: Promise (Last AppResponse) AppSchema ContractError ()
 endpoints =
@@ -56,6 +63,7 @@ endpoints =
       `select` endpoint @"ownFirstPaymentPubKeyHash" (const ownFirstPaymentPubKeyHash >=> tellAppResponse OwnFirstPaymentPubKeyHash)
       `select` endpoint @"mintAsset" (mintAsset >=> tellAppResponse MintAsset)
       `select` endpoint @"ownFunds" (const ownFunds >=> tellAppResponse OwnFunds)
+      `select` endpoint @"splitWalletValueBy" splitWalletValueBy
   )
     <> endpoints
 
@@ -97,3 +105,18 @@ mintAsset amount = do
           <> Constraints.mustBeSignedBy pkh
   _ <- submitTxConstraintsWith @Scripts.Any lookups mintTx
   pure asset
+
+splitWalletValueBy ::
+  Integer ->
+  Contract (Last AppResponse) AppSchema ContractError ()
+splitWalletValueBy n = do
+  val <- ownFunds
+  pkh <- ownFirstPaymentPubKeyHash
+  let adaAmount = Ada.getLovelace $ Ada.fromValue val
+  let splitAmount = adaAmount `div` n
+  let outputs = replicate (fromIntegral n - 1) $ Constraints.mustPayToPubKey pkh (Ada.lovelaceValueOf splitAmount)
+  let tx =
+        fold outputs
+          <> Constraints.mustBeSignedBy pkh
+  _ <- submitTxConstraintsWith @Scripts.Any mempty tx
+  pure ()
