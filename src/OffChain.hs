@@ -56,6 +56,7 @@ type AppSchema =
     .\/ Endpoint "ownFirstPaymentPubKeyHash" ()
     .\/ Endpoint "mintAsset" Integer
     .\/ Endpoint "splitWalletValueBy" Integer
+    .\/ Endpoint "sendAdaTo" (Integer, PaymentPubKeyHash)
 
 endpoints :: Promise (Last AppResponse) AppSchema ContractError ()
 endpoints =
@@ -64,6 +65,7 @@ endpoints =
       `select` endpoint @"mintAsset" (mintAsset >=> tellAppResponse MintAsset)
       `select` endpoint @"ownFunds" (const ownFunds >=> tellAppResponse OwnFunds)
       `select` endpoint @"splitWalletValueBy" splitWalletValueBy
+      `select` endpoint @"sendAdaTo" (uncurry sendAdaTo)
   )
     <> endpoints
 
@@ -118,5 +120,17 @@ splitWalletValueBy n = do
   let tx =
         fold outputs
           <> Constraints.mustBeSignedBy pkh
+  _ <- submitTxConstraintsWith @Scripts.Any mempty tx
+  pure ()
+
+sendAdaTo ::
+  Integer ->
+  PaymentPubKeyHash ->
+  Contract (Last AppResponse) AppSchema ContractError ()
+sendAdaTo amount receiver = do
+  sender <- ownFirstPaymentPubKeyHash
+  let tx =
+        Constraints.mustPayToPubKey receiver (Ada.lovelaceValueOf amount)
+          <> Constraints.mustBeSignedBy sender
   _ <- submitTxConstraintsWith @Scripts.Any mempty tx
   pure ()
