@@ -93,6 +93,7 @@ executable dump-script
     bytestring,
     plutus-ledger-api,
     plutus-ledger,
+    plutus-core,
     cardano-ledger-alonzo,
     cardano-api,
     plutus-starter,
