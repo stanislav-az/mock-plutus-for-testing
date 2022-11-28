@@ -51,6 +51,8 @@ library
       containers -any,
       freer-extras -any,
       playground-common -any,
+      cardano-api,
+      serialise,
       plutus-contract -any,
       plutus-ledger -any,
       plutus-ledger-api -any,
@@ -75,3 +77,22 @@ executable pab
     base >= 4.9 && < 5,
     plutus-starter,
     plutus-pab
+
+executable dump-script
+  import: lang
+  main-is: Main.hs
+  other-modules:
+    Options
+  hs-source-dirs: dump-script
+  ghc-options:
+    -threaded
+  build-depends:
+    base >= 4.9 && < 5,
+    text,
+    optparse-applicative,
+    bytestring,
+    plutus-ledger-api,
+    plutus-ledger,
+    cardano-ledger-alonzo,
+    cardano-api,
+    plutus-starter,

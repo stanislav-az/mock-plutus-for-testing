@@ -2,3 +2,5 @@ cradle:
   cabal:
     - path: "./src"
       component: "plutus-starter:lib:plutus-starter"
+    - path: "./dump-script"
+      component: "plutus-starter:exe:dump-script"
