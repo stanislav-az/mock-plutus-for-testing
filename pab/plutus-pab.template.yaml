@@ -1,4 +1,4 @@
-dbConfig:
+sqliteDB:
   dbConfigFile: <NODE_PATH>/pab-core.db
   dbConfigPoolSize: 20
 
@@ -19,7 +19,7 @@ walletServerConfig:
 
 nodeServerConfig:
   pscBaseUrl: http://localhost:3001
-  pscSocketPath: <NODE_PATH>/configuration/sockets/node.socket
+  pscSocketPath: <NODE_PATH>/sockets/node.socket
   pscKeptBlocks: 100
   pscNetworkId: "1" # Testnet network ID (main net = empty string)
   pscSlotConfig:
