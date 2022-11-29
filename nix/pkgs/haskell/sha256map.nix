@@ -1,5 +1,5 @@
 {
-  "https://github.com/input-output-hk/plutus-apps.git"."v1.0.0-alpha1" = "0w13qd7jn5by7mfz8m1vh6w1cy3d06sq7hz1ikjswfzvvky8i2q8";
+  "https://github.com/input-output-hk/plutus-apps.git"."2b811787dc3ab20cc2b0d1bfedf6f5b9a745d5c3" = "1ryxnqm4h0w3pf4bq6fqa8xg1j1si5qpvpcmhmirzxqk638779zi";
   "https://github.com/Quid2/flat"."ee59880f47ab835dbd73bea0847dab7869fc20d8" = "1lrzknw765pz2j97nvv9ip3l1mcpf2zr4n56hwlz0rk7wq7ls4cm";
   "https://github.com/input-output-hk/ekg-forward"."297cd9db5074339a2fb2e5ae7d0780debb670c63" = "1zcwry3y5rmd9lgxy89wsb3k4kpffqji35dc7ghzbz603y1gy24g";
   "https://github.com/input-output-hk/cardano-addresses"."b7273a5d3c21f1a003595ebf1e1f79c28cd72513" = "129r5kyiw10n2021bkdvnr270aiiwyq58h472d151ph0r7wpslgp";
@@ -7,7 +7,7 @@
   "https://github.com/input-output-hk/cardano-config"."1646e9167fab36c0bff82317743b96efa2d3adaa" = "sha256-TNbpnR7llUgBN2WY7CryMxNVupBIUH01h1hRNHoxboY=";
   "https://github.com/input-output-hk/cardano-crypto"."f73079303f663e028288f9f4a9e08bcca39a923e" = "1n87i15x54s0cjkh3nsxs4r1x016cdw1fypwmr68936n3xxsjn6q";
   "https://github.com/input-output-hk/cardano-ledger"."c7c63dabdb215ebdaed8b63274965966f2bf408f" = "sha256-zTQbMOGPD1Oodv6VUsfF6NUiXkbN8SWI98W3Atv4wbI=";
-  "https://github.com/input-output-hk/cardano-node"."1.35.3-rc1" = "020fwimsm24yblr1fmnwx240wj8r3x715p89cpjgnnd8axwf32p0";
+  "https://github.com/input-output-hk/cardano-node"."1.35.3" = "020fwimsm24yblr1fmnwx240wj8r3x715p89cpjgnnd8axwf32p0";
   "https://github.com/input-output-hk/cardano-prelude"."bb4ed71ba8e587f672d06edf9d2e376f4b055555" = "00h10l5mmiza9819p9v5q5749nb9pzgi20vpzpy1d34zmh6gf1cj";
   "https://github.com/input-output-hk/cardano-wallet"."18a931648550246695c790578d4a55ee2f10463e" = "0i40hp1mdbljjcj4pn3n6zahblkb2jmpm8l4wnb36bya1pzf66fx";
   "https://github.com/input-output-hk/goblins"."cde90a2b27f79187ca8310b6549331e59595e7ba" = "17c88rbva3iw82yg9srlxjv2ia5wjb9cyqw44hik565f5v9svnyg";

@@ -13,17 +13,20 @@ benchmarks: true
 source-repository-package
   type: git
   location: https://github.com/input-output-hk/plutus-apps.git
-  tag: v1.0.0-alpha1
+  tag: 2b811787dc3ab20cc2b0d1bfedf6f5b9a745d5c3
   subdir:
+    cardano-streaming
     doc
     freer-extras
+    marconi
+    marconi-mamba
     playground-common
+    pab-blockfrost
     plutus-chain-index
     plutus-chain-index-core
     plutus-contract
-    plutus-example
-    plutus-hysterical-screams
     plutus-contract-certification
+    plutus-example
     plutus-ledger
     plutus-ledger-constraints
     plutus-pab
@@ -32,9 +35,8 @@ source-repository-package
     plutus-script-utils
     plutus-tx-constraints
     plutus-use-cases
-    plutus-streaming
+    rewindable-index
     web-ghc
-
 
 -- The following sections are copied from the 'plutus-apps' repository cabal.project at the revision
 -- given above.
@@ -49,8 +51,9 @@ write-ghc-environment-files: never
 tests: true
 benchmarks: true
 
--- The only sensible test display option.
-test-show-details: streaming
+-- The only sensible test display option, since it allows us to have colourized
+-- 'tasty' output.
+test-show-details: direct
 
 -- cardano-addresses unit tests bring in some version constraint conflicts:
 --
@@ -261,7 +264,7 @@ source-repository-package
 source-repository-package
     type: git
     location: https://github.com/input-output-hk/cardano-node
-    tag: 1.35.3-rc1
+    tag: 1.35.3
     subdir:
       cardano-api
       cardano-git-rev
