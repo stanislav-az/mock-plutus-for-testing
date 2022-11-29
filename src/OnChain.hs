@@ -15,26 +15,11 @@ import Cardano.Api.Shelley (PlutusScript (..), PlutusScriptV2)
 import Codec.Serialise (serialise)
 import qualified Data.ByteString.Lazy as LB
 import qualified Data.ByteString.Short as SBS
-import Ledger
-  ( AssetClass,
-    CurrencySymbol,
-    MintingPolicy,
-    PaymentPubKeyHash (unPaymentPubKeyHash),
-    PubKeyHash,
-    Script,
-    TokenName,
-    Validator (Validator),
-    Value,
-    mkMintingPolicyScript,
-    unMintingPolicyScript,
-  )
-import qualified Ledger.Scripts as Scripts
+import Ledger (CurrencySymbol, PaymentPubKeyHash (..), PubKeyHash, TokenName, Value)
 import Ledger.Value (AssetClass (AssetClass), assetClassValue)
+import qualified Plutus.Script.Utils.V2.Scripts as Scripts
 import qualified Plutus.Script.Utils.V2.Typed.Scripts as Scripts
 import qualified Plutus.V2.Ledger.Api as Ledger
-  ( scriptContextTxInfo,
-    txInfoSignatories,
-  )
 import Plutus.V2.Ledger.Contexts
   ( ScriptContext (..),
     TxInfo,
@@ -54,9 +39,9 @@ mkMintingPolicy (pkh, _) _ ctx =
     signer :: PubKeyHash
     [signer] = Ledger.txInfoSignatories info
 
-tokenMintingPolicy :: PaymentPubKeyHash -> Integer -> MintingPolicy
+tokenMintingPolicy :: PaymentPubKeyHash -> Integer -> Scripts.MintingPolicy
 tokenMintingPolicy pkh n =
-  mkMintingPolicyScript $
+  Ledger.mkMintingPolicyScript $
     $$(PlutusTx.compile [||Scripts.mkUntypedMintingPolicy . mkMintingPolicy||])
       `PlutusTx.applyCode` PlutusTx.liftCode (pkh, n)
 
@@ -78,16 +63,16 @@ testTokenAsset pkh = AssetClass (tokenCurrencySymbol pkh testParam, testTokenNam
 testTokenValue :: PaymentPubKeyHash -> Integer -> Value
 testTokenValue pkh = assetClassValue (testTokenAsset pkh)
 
-testTokenMintingPolicy :: PaymentPubKeyHash -> MintingPolicy
+testTokenMintingPolicy :: PaymentPubKeyHash -> Scripts.MintingPolicy
 testTokenMintingPolicy pkh = tokenMintingPolicy pkh testParam
 
 ---------------------------------------------- ::Script serialization:: ----------------------------------------------
-plutusScript :: PaymentPubKeyHash -> Integer -> Script
+plutusScript :: PaymentPubKeyHash -> Integer -> Ledger.Script
 plutusScript pkh n =
-  unMintingPolicyScript (tokenMintingPolicy pkh n)
+  Ledger.unMintingPolicyScript (tokenMintingPolicy pkh n)
 
-validator :: PaymentPubKeyHash -> Integer -> Validator
-validator pkh n = Validator $ plutusScript pkh n
+validator :: PaymentPubKeyHash -> Integer -> Scripts.Validator
+validator pkh n = Ledger.Validator $ plutusScript pkh n
 
 scriptAsCbor :: PaymentPubKeyHash -> Integer -> LB.ByteString
 scriptAsCbor pkh n = serialise $ validator pkh n
