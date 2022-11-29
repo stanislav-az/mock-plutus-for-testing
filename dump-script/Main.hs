@@ -30,8 +30,8 @@ main = do
   costParams <- maybe (error "defaultCostModelParams failed") pure Plutus.defaultCostModelParams
   evalContext <- either (error . show) pure $ Plutus.mkEvaluationContext costParams
   let pkh = PaymentPubKeyHash . PubKeyHash . toBuiltin $ pubKeyHash
-  -- let scriptParams = [Plutus.toData number, Plutus.toData pkh]
-  let (logout, e) = Plutus.evaluateScriptCounting vasilPV Plutus.Verbose evalContext (scriptShortBs pkh number) []
+  let scriptParams = [Plutus.toData (pkh, number)]
+  let (logout, e) = Plutus.evaluateScriptCounting vasilPV Plutus.Verbose evalContext (scriptShortBs pkh number) scriptParams
   putStrLn "Log output: " >> print logout
   case e of
     Left evalErr -> putStrLn "Eval Error: " >> print evalErr
