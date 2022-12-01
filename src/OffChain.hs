@@ -101,7 +101,7 @@ mintAsset amount = do
   pkh <- ownFirstPaymentPubKeyHash
   let mintingPolicy = testTokenMintingPolicy pkh
   let asset = testTokenAsset pkh
-  let lookups = Constraints.plutusV2MintingPolicy mintingPolicy
+  let lookups = Constraints.plutusV1MintingPolicy mintingPolicy
   let mintTx =
         Constraints.mustMintValue (testTokenValue pkh amount)
           <> Constraints.mustBeSignedBy pkh

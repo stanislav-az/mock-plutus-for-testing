@@ -11,7 +11,7 @@
 
 module OnChain where
 
-import Cardano.Api.Shelley (PlutusScript (..), PlutusScriptV2)
+import Cardano.Api.Shelley (PlutusScript (..), PlutusScriptV1)
 import Codec.Serialise (serialise)
 import qualified Data.ByteString.Lazy as LB
 import qualified Data.ByteString.Short as SBS
@@ -74,7 +74,7 @@ validator pkh n = Ledger.Validator $ plutusScript pkh n
 scriptAsCbor :: PaymentPubKeyHash -> Integer -> LB.ByteString
 scriptAsCbor pkh n = serialise $ validator pkh n
 
-cardanoApiMintingScript :: PaymentPubKeyHash -> Integer -> PlutusScript PlutusScriptV2
+cardanoApiMintingScript :: PaymentPubKeyHash -> Integer -> PlutusScript PlutusScriptV1
 cardanoApiMintingScript pkh n = PlutusScriptSerialised . SBS.toShort . LB.toStrict $ scriptAsCbor pkh n
 
 scriptShortBs :: PaymentPubKeyHash -> Integer -> SBS.ShortByteString

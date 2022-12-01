@@ -18,9 +18,9 @@ import Options
     options,
   )
 import Options.Applicative (execParser)
-import Plutus.V1.Ledger.ProtocolVersions (vasilPV)
-import Plutus.V2.Ledger.Api (toBuiltin)
-import qualified Plutus.V2.Ledger.Api as Plutus
+import Plutus.V1.Ledger.ProtocolVersions (alonzoPV)
+import Plutus.V1.Ledger.Api (toBuiltin)
+import qualified Plutus.V1.Ledger.Api as Plutus
 import qualified PlutusCore as Plutus
 import Prelude
 
@@ -31,7 +31,7 @@ main = do
   evalContext <- either (error . show) pure $ Plutus.mkEvaluationContext costParams
   let pkh = PaymentPubKeyHash . PubKeyHash . toBuiltin $ pubKeyHash
   let scriptParams = [Plutus.toData (pkh, number)]
-  let (logout, e) = Plutus.evaluateScriptCounting vasilPV Plutus.Verbose evalContext (scriptShortBs pkh number) scriptParams
+  let (logout, e) = Plutus.evaluateScriptCounting alonzoPV Plutus.Verbose evalContext (scriptShortBs pkh number) scriptParams
   putStrLn "Log output: " >> print logout
   case e of
     Left evalErr -> putStrLn "Eval Error: " >> print evalErr
