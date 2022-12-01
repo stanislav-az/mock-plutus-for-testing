@@ -17,23 +17,20 @@ import qualified Data.ByteString.Lazy as LB
 import qualified Data.ByteString.Short as SBS
 import Ledger (CurrencySymbol, PaymentPubKeyHash (..), PubKeyHash, TokenName, Value)
 import Ledger.Value (AssetClass (AssetClass), assetClassValue)
-import qualified Plutus.Script.Utils.V2.Scripts as Scripts
-import qualified Plutus.Script.Utils.V2.Typed.Scripts as Scripts
-import qualified Plutus.V2.Ledger.Api as Ledger
-import Plutus.V2.Ledger.Contexts
-  ( ScriptContext (..),
-    TxInfo,
-  )
+import qualified Plutus.Script.Utils.V1.Scripts as Scripts
+import qualified Plutus.Script.Utils.V1.Typed.Scripts as Scripts
+import qualified Plutus.V1.Ledger.Api as Ledger
+import qualified Plutus.V1.Ledger.Contexts as V1
 import qualified PlutusTx
 import PlutusTx.Prelude
 
 {-# INLINEABLE mkMintingPolicy #-}
-mkMintingPolicy :: (PaymentPubKeyHash, Integer) -> () -> ScriptContext -> Bool
+mkMintingPolicy :: (PaymentPubKeyHash, Integer) -> () -> V1.ScriptContext -> Bool
 mkMintingPolicy (pkh, _) _ ctx =
   traceIfFalse "Not signed by the correct PubKeyHash" $
     signer == unPaymentPubKeyHash pkh
   where
-    info :: TxInfo
+    info :: V1.TxInfo
     !info = Ledger.scriptContextTxInfo ctx
 
     signer :: PubKeyHash
