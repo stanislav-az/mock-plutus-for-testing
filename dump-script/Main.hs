@@ -23,13 +23,15 @@ import Plutus.V2.Ledger.Api (toBuiltin)
 import qualified Plutus.V2.Ledger.Api as Plutus
 import qualified PlutusCore as Plutus
 import Prelude
+import qualified Data.Aeson as J
 
 main :: IO ()
 main = do
   MintContractOpts {..} <- execParser options
+  pkhParsed <- either error (pure . PubKeyHash) $ J.eitherDecodeStrict pubKeyHash
+  let pkh = PaymentPubKeyHash pkhParsed
   costParams <- maybe (error "defaultCostModelParams failed") pure Plutus.defaultCostModelParams
   evalContext <- either (error . show) pure $ Plutus.mkEvaluationContext costParams
-  let pkh = PaymentPubKeyHash . PubKeyHash . toBuiltin $ pubKeyHash
   let scriptParams = [Plutus.toData (pkh, number)]
   let (logout, e) = Plutus.evaluateScriptCounting vasilPV Plutus.Verbose evalContext (scriptShortBs pkh number) scriptParams
   putStrLn "Log output: " >> print logout

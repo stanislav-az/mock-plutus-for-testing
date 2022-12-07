@@ -97,6 +97,7 @@ executable dump-script
   build-depends:
     base >= 4.9 && < 5,
     text,
+    aeson,
     optparse-applicative,
     bytestring,
     plutus-ledger-api,
